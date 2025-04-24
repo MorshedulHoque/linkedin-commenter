@@ -23,7 +23,7 @@ jobs:
       # Step 3: Install Python dependencies for Flask
       - name: Install Python dependencies for Flask
         run: |
-          ssh -o StrictHostKeyChecking=no utsho@20a3.82.193.150 << 'EOF'
+          ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
             cd /home/utsho1/htdocs/linkedin-commenter/  # Go to your project directory
             source venv/bin/activate  # Activate the virtual environment
             pip install -r requirements.txt  # Install the Python dependencies
