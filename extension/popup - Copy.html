@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login with Flask</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+            width: 200px;
+            height: 250px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .feature {
+            font-size: 16px;
+            color: #4a5568;
+            text-align: left;
+            margin: 10px 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #5a67d8;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #434190;
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        #signUpButton {
+            margin-top: 20px;
+        }
+
+        #signInButton {
+            background-color: #718096;
+        }
+
+        #signInButton:hover {
+            background-color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="greeting">LinkedIn Comment Generator</h1>
+    <p class="feature"><strong>Custom Tone Selector:</strong></p>
+    <p class="feature"><strong>Contextual Analysis:</strong></p>
+    <p class="feature"><strong>Enhanced Engagement Tools:</strong></p>
+    <h1 id="greeting"></h1>
+    <h2 id="requestCount"></h2>
+    <h2 id="requestsLeft"></h2>
+    <button id="login">Login</button>
+    <button id="logout" style="display: none;">Logout</button>
+    <button id="openDashboard" style="display: none;">Dashboard</button> <!-- Dashboard button -->
+    <script src="popup.js"></script>
+</body>
+</html>
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Fetch user data from local storage
+    chrome.storage.local.get(['name', 'isLoggedIn', 'userId'], (result) => {
+        console.log('Storage Result:', result);
+        if (result.isLoggedIn && result.name) {
+            document.getElementById('greeting').textContent = 'Hi ' + result.name;
+            
+            // Fetch the latest request count from the Flask backend
+            fetchRequestCount(result.userId);
+
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('logout').style.display = 'block';
+            document.getElementById('openDashboard').style.display = 'block'; // Ensure the dashboard button is shown
+            document.querySelectorAll('.feature').forEach(el => el.style.display = 'none'); // Hide feature descriptions
+        } else {
+            document.getElementById('greeting').textContent = 'Not logged in';
+            document.getElementById('login').style.display = 'block';
+            document.getElementById('logout').style.display = 'none';
+            document.getElementById('openDashboard').style.display = 'none'; // Ensure the dashboard button is hidden
+            document.querySelectorAll('.feature').forEach(el => el.style.display = 'block'); // Show feature descriptions
+        }
+    });
