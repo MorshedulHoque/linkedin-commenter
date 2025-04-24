@@ -33,7 +33,7 @@ jobs:
       - name: Install Python dependencies for Flask
         run: |
           ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
-            cd /home/utsho1/htdocs/linkedin-commenter/  # Go to your project directory
+            cd /home/linkedin-commenter/  # Go to your project directory
 
             # Create virtual environment if it doesn't exist
             if [ ! -d "venv" ]; then
@@ -50,7 +50,7 @@ jobs:
       - name: Install Node.js dependencies
         run: |
           ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
-            cd /home/utsho1/htdocs/linkedin-commenter/extension/scripts  # Go to your Node.js project directory
+            cd /home/linkedin-commenter/extension/scripts  # Go to your Node.js project directory
             npm install  # Install Node.js dependencies
           EOF
 
@@ -58,7 +58,7 @@ jobs:
       - name: Pull latest changes on the server
         run: |
           ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
-            cd /home/utsho1/htdocs/linkedin-commenter/  # Go to your project directory
+            cd /home/linkedin-commenter/  # Go to your project directory
             git pull origin main  # Pull the latest code from the main branch
           EOF
 
