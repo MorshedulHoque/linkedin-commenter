@@ -1,4 +1,4 @@
-name: Deploy LinkedIn Commenter to VPS
+name: Deploy LinkedIn Commenter Backend to VPS
 
 on:
   push:
@@ -14,30 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up SSH for secure communication with the server
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # GitHub Secrets for your private SSH key
-
-      # Step 3: Install Python dependencies for Flask
-      - name: Install Python dependencies for Flask
-        run: |
-          ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
-            cd /home/utsho1/htdocs/linkedin-commenter/  # Go to your project directory
-            source venv/bin/activate  # Activate the virtual environment
-            pip install -r requirements.txt  # Install the Python dependencies
-          EOF
-
-      # Step 4: Install Node.js dependencies for the extension (if applicable)
-      - name: Install Node.js dependencies
-        run: |
-          ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
-            cd /home/utsho1/htdocs/linkedin-commenter/extension/scripts  # Go to your Node.js project directory
-            npm install  # Install Node.js dependencies
-          EOF
-
-      # Step 5: Pull the latest code from GitHub to the VPS
+      # Step 2: Pull the latest code on the VPS (assumes the VPS has access to the repository)
       - name: Pull latest changes on the server
         run: |
           ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
@@ -45,13 +22,29 @@ jobs:
             git pull origin main  # Pull the latest code from the main branch
           EOF
 
-      # Step 6: Restart services (Flask and Node.js)
+      # Step 3: Install dependencies for Flask and Node.js on the VPS
+      - name: Install dependencies for Flask
+        run: |
+          ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
+            cd /home/utsho1/htdocs/linkedin-commenter/  # Go to your project directory
+            source venv/bin/activate  # Activate virtual environment for Flask
+            pip install -r requirements.txt  # Install Python dependencies
+          EOF
+
+      - name: Install dependencies for Node.js
+        run: |
+          ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
+            cd /home/utsho1/htdocs/linkedin-commenter/extension/scripts  # Go to Node.js directory
+            npm install  # Install Node.js dependencies
+          EOF
+
+      # Step 4: Restart the backend services (Flask and Node.js)
       - name: Restart services
         run: |
           ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
-            # Restart Flask using Gunicorn (adjust according to your configuration)
+            # Restart Flask using Gunicorn (adjust the service name if necessary)
             sudo systemctl restart gunicorn  # Restart the Flask service
 
             # Restart Node.js application using PM2 (or your preferred process manager)
-            pm2 restart server.js  # Adjust the name of the Node.js app if needed
+            pm2 restart server.js  # Adjust the name of your Node.js app if needed
           EOF
