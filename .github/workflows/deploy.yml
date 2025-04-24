@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # Run on the latest Ubuntu runner
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
 
     steps:
       # Step 1: Checkout code from GitHub repository
@@ -20,16 +20,34 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # GitHub Secrets for your private SSH key
 
-      # Step 3: Install Python dependencies for Flask
+      # Step 3: Install system dependencies for Python and Node.js
+      - name: Install system dependencies
+        run: |
+          ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
+            # Update and install necessary packages (Python, pip, and Node.js)
+            sudo apt-get update -y
+            sudo apt-get install -y python3 python3-pip python3-venv nodejs npm  # Install Python3, pip, virtualenv, Node.js, and npm
+            sudo apt-get install -y python3-dev build-essential  # Install development tools for compiling dependencies
+          EOF
+
+      # Step 4: Install Python dependencies for Flask
       - name: Install Python dependencies for Flask
         run: |
           ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
             cd /home/utsho1/htdocs/linkedin-commenter/  # Go to your project directory
-            source venv/bin/activate  # Activate the virtual environment
-            pip install -r requirements.txt  # Install the Python dependencies
+
+            # Create virtual environment if it doesn't exist
+            if [ ! -d "venv" ]; then
+              python3 -m venv venv  # Create the virtual environment
+            fi
+
+            # Activate the virtual environment and install dependencies
+            source venv/bin/activate
+            pip install --upgrade pip  # Ensure pip is up to date
+            pip install -r requirements.txt  # Install Python dependencies
           EOF
 
-      # Step 4: Install Node.js dependencies for the extension (if applicable)
+      # Step 5: Install Node.js dependencies for the extension (if applicable)
       - name: Install Node.js dependencies
         run: |
           ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
@@ -37,7 +55,7 @@ jobs:
             npm install  # Install Node.js dependencies
           EOF
 
-      # Step 5: Pull the latest code from GitHub to the VPS
+      # Step 6: Pull the latest code from GitHub to the VPS
       - name: Pull latest changes on the server
         run: |
           ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
@@ -45,13 +63,13 @@ jobs:
             git pull origin main  # Pull the latest code from the main branch
           EOF
 
-      # Step 6: Restart services (Flask and Node.js)
+      # Step 7: Restart services (Flask and Node.js)
       - name: Restart services
         run: |
           ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
-            # Restart Flask using Gunicorn (adjust according to your configuration)
+            # Restart Flask using Gunicorn (adjust the service name if necessary)
             sudo systemctl restart gunicorn  # Restart the Flask service
 
             # Restart Node.js application using PM2 (or your preferred process manager)
-            pm2 restart server.js  # Adjust the name of the Node.js app if needed
+            pm2 restart server.js  # Adjust the name of your Node.js app if needed
           EOF
