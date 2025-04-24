@@ -25,7 +25,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no utsho@203.82.193.150 << 'EOF'
             # Update and install necessary packages (Python, pip, and Node.js)
-            sudo apt-get update -y
             sudo apt-get install -y python3 python3-pip python3-venv nodejs npm build-essential  # Install Python3, pip, virtualenv, Node.js, and npm
             sudo apt-get install -y python3-dev libpython3-dev zlib1g-dev  # Install development tools for compiling dependencies
           EOF
