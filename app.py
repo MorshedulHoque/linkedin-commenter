@@ -185,42 +185,6 @@ def verify_otp():
     return render_template('verify_otp.html', ext_id=extension_id)
 
 
-
-
-
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'POST':
-#         email = request.form['email']
-#         password = request.form['password']
-
-#         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#         cursor.execute('SELECT * FROM user WHERE email = %s', (email,))
-#         account = cursor.fetchone()
-
-#         if account and check_password_hash(account['password'], password):
-#             session['email'] = email
-#             session['full_name'] = account['full_name']
-#             session['user_id'] = account['Id']  # Store user ID in session
-#             extension_id = request.args.get('ext_id', 'default_extension_id')
-#             full_name_encoded = quote(account['full_name'])
-#             user_id = account['Id']  # Retrieve user_id from the database
-#             # Pass both user_id and full_name in the redirect URL
-#             # Fetch today's request_count from daily_usage for this user
-#             today = datetime.date.today()
-#             cursor.execute('SELECT request_count FROM daily_usage WHERE user_id = %s AND date = %s', (user_id, today))
-#             usage = cursor.fetchone()
-
-#             request_count = usage['request_count'] if usage else 0  # Default to 0 if no usage record exists for today
-
-#             # Pass both user_id, full_name, and request_count in the redirect URL
-#             return redirect(f'http://{extension_id}.chromiumapp.org/?name={full_name_encoded}&user_id={user_id}&request_count={request_count}')
-#         else:
-#             flash('Invalid login attempt.', 'danger')
-#     return render_template('login.html')
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
